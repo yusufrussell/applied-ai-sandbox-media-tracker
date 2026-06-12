@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Media Tracker{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="{{ url_for('home') }}">📋 Media Tracker</a>
+    <div class="nav-links">
+      <a href="{{ url_for('home') }}"
+         class="{{ 'active' if not request.args.get('category') }}">All</a>
+      {% for cat in categories %}
+        <a href="{{ url_for('home', category=cat.value) }}"
+           class="{{ 'active' if request.args.get('category') == cat.value }}">
+          {{ cat.value.replace('_', ' ').title() }}
+          {% if category_counts[cat] %}
+            <span class="nav-count">{{ category_counts[cat] }}</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  </nav>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

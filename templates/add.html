@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Add — Media Tracker{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <h1>Add to list</h1>
+  </div>
+
+  <form method="POST" style="max-width: 520px;">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input id="title" name="title" type="text"
+             value="{{ form.get('title', '') }}" autofocus>
+      {% if errors.get('title') %}
+        <p class="error">{{ errors.title }}</p>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        {% for cat in categories %}
+          <option value="{{ cat.value }}"
+            {{ 'selected' if form.get('category') == cat.value }}>
+            {{ cat.value.replace('_', ' ').title() }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        {% for st in statuses %}
+          <option value="{{ st.value }}"
+            {{ 'selected' if form.get('status') == st.value }}>
+            {{ st.value.replace('_', ' ').title() }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="rating">Rating (1–10, optional)</label>
+      <input id="rating" name="rating" type="number" min="1" max="10"
+             value="{{ form.get('rating', '') }}" style="max-width: 100px;">
+      {% if errors.get('rating') %}
+        <p class="error">{{ errors.rating }}</p>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notes (optional)</label>
+      <textarea id="notes" name="notes" rows="3">{{ form.get('notes', '') }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" type="submit">Save</button>
+      <a class="btn btn-secondary" href="{{ url_for('home') }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}
