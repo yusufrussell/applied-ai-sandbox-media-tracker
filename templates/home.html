@@ -1,20 +1,53 @@
 {% extends "base.html" %}
 
-{% block title %}Media Tracker — All{% endblock %}
+{% block title %}
+  {% if active_category %}
+    {{ active_category.value.replace('_', ' ').title() }}
+  {% else %}All{% endif %} — Media Tracker
+{% endblock %}
 
 {% block content %}
   <div class="page-header">
-    <h1>My List <span class="count">({{ total }})</span></h1>
+    <h1>
+      {% if active_category %}
+        {{ active_category.value.replace('_', ' ').title() }}
+      {% else %}
+        My List
+      {% endif %}
+      <span class="count">({{ total }})</span>
+    </h1>
     <a class="btn" href="{{ url_for('add') }}">+ Add</a>
   </div>
 
+  {# ── Status filter bar ── #}
+  <div class="filter-bar">
+    <a href="{{ url_for('home', category=request.args.get('category') or '') }}"
+       class="filter-pill {{ 'active' if not active_status }}">All</a>
+    {% for st in statuses %}
+      <a href="{{ url_for('home', category=request.args.get('category') or '', status=st.value) }}"
+         class="filter-pill {{ 'active' if active_status == st }}">
+        {{ st.value.replace('_', ' ').title() }}
+      </a>
+    {% endfor %}
+    {% if active_status or active_category %}
+      <a href="{{ url_for('home') }}" class="filter-clear">✕ Clear filters</a>
+    {% endif %}
+  </div>
+
   {% if total == 0 %}
-    <p class="empty">Nothing tracked yet. Hit <strong>+ Add</strong> to get started.</p>
+    <p class="empty">
+      {% if active_status or active_category %}
+        No items match this filter.
+      {% else %}
+        Nothing tracked yet. Hit <strong>+ Add</strong> to get started.
+      {% endif %}
+    </p>
   {% else %}
     {% for cat, items in grouped.items() %}
       {% if items %}
         <section class="category-section">
-          <h2 class="category-heading">{{ cat.value.replace('_', ' ').title() }}
+          <h2 class="category-heading">
+            {{ cat.value.replace('_', ' ').title() }}
             <span class="count">{{ items|length }}</span>
           </h2>
           <div class="item-grid">

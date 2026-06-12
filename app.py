@@ -14,16 +14,50 @@ def create_app() -> Flask:
 
     @app.context_processor
     def inject_categories() -> dict:
-        return {"categories": list(MediaCategory)}
+        return {
+            "categories": list(MediaCategory),
+            "category_counts": {
+                cat: len(app.library.filter_by_category(cat))
+                for cat in MediaCategory
+            },
+        }
 
     @app.route("/")
     def home():
-        items = app.library.all()
-        grouped = {
-            cat: app.library.filter_by_category(cat)
-            for cat in MediaCategory
-        }
-        return render_template("home.html", grouped=grouped, total=len(items))
+        cat_param = request.args.get("category", "")
+        status_param = request.args.get("status", "")
+
+        active_category = None
+        if cat_param:
+            try:
+                active_category = MediaCategory(cat_param)
+            except ValueError:
+                pass
+
+        active_status = None
+        if status_param:
+            try:
+                active_status = MediaStatus(status_param)
+            except ValueError:
+                pass
+
+        cats_to_show = [active_category] if active_category else list(MediaCategory)
+        grouped: dict = {}
+        for cat in cats_to_show:
+            items = app.library.filter_by_category(cat)
+            if active_status:
+                items = [i for i in items if i.status == active_status]
+            grouped[cat] = items
+
+        total = sum(len(v) for v in grouped.values())
+        return render_template(
+            "home.html",
+            grouped=grouped,
+            total=total,
+            active_category=active_category,
+            active_status=active_status,
+            statuses=list(MediaStatus),
+        )
 
     @app.route("/add", methods=["GET", "POST"])
     def add():
