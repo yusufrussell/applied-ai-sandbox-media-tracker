@@ -19,6 +19,42 @@
     <a class="btn" href="{{ url_for('add') }}">+ Add</a>
   </div>
 
+  {# ── Search + sort toolbar ── #}
+  <div class="toolbar">
+    <form class="search-form" method="GET" action="{{ url_for('home') }}">
+      {% if request.args.get('category') %}
+        <input type="hidden" name="category" value="{{ request.args.get('category') }}">
+      {% endif %}
+      {% if request.args.get('status') %}
+        <input type="hidden" name="status" value="{{ request.args.get('status') }}">
+      {% endif %}
+      {% if sort_key != 'date' %}
+        <input type="hidden" name="sort" value="{{ sort_key }}">
+      {% endif %}
+      <input class="search-input" type="text" name="q"
+             value="{{ query }}" placeholder="Search titles…">
+      <button class="btn" type="submit">Search</button>
+      {% if query %}
+        <a class="filter-clear" href="{{ url_for('home',
+            category=request.args.get('category',''),
+            status=request.args.get('status',''),
+            sort=sort_key) }}">✕ Clear</a>
+      {% endif %}
+    </form>
+
+    <div class="sort-links">
+      <span class="sort-label">Sort:</span>
+      {% for label, key in [('Newest', 'date'), ('Title A–Z', 'title'), ('Rating', 'rating')] %}
+        <a href="{{ url_for('home',
+               category=request.args.get('category',''),
+               status=request.args.get('status',''),
+               q=query,
+               sort=key) }}"
+           class="sort-link {{ 'active' if sort_key == key }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
   {# ── Status filter bar ── #}
   <div class="filter-bar">
     <a href="{{ url_for('home', category=request.args.get('category') or '') }}"
@@ -36,7 +72,7 @@
 
   {% if total == 0 %}
     <p class="empty">
-      {% if active_status or active_category %}
+      {% if active_status or active_category or query %}
         No items match this filter.
       {% else %}
         Nothing tracked yet. Hit <strong>+ Add</strong> to get started.

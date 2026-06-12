@@ -6,6 +6,20 @@ from models import MediaCategory, MediaItem, MediaLibrary, MediaStatus
 from storage import load, save
 
 
+def _sort(items: list, key: str) -> list:
+    if key == "rating":
+        rated = sorted(
+            (i for i in items if i.rating is not None),
+            key=lambda i: i.rating,  # type: ignore[arg-type]
+            reverse=True,
+        )
+        return rated + [i for i in items if i.rating is None]
+    if key == "title":
+        return sorted(items, key=lambda i: i.title.lower())
+    # default: date descending (newest first)
+    return sorted(items, key=lambda i: i.date_added, reverse=True)
+
+
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "media-tracker-dev-key"
@@ -26,6 +40,8 @@ def create_app() -> Flask:
     def home():
         cat_param = request.args.get("category", "")
         status_param = request.args.get("status", "")
+        sort_param = request.args.get("sort", "date")
+        query = (request.args.get("q") or "").strip()
 
         active_category = None
         if cat_param:
@@ -41,13 +57,24 @@ def create_app() -> Flask:
             except ValueError:
                 pass
 
+        # 1 — filter
+        items = (
+            app.library.filter_by_category(active_category)
+            if active_category else app.library.all()
+        )
+        if active_status:
+            items = [i for i in items if i.status == active_status]
+        if query:
+            q = query.lower()
+            items = [i for i in items if q in i.title.lower()]
+
+        # 2 — sort the filtered list
+        sort_key = sort_param if sort_param in {"rating", "title", "date"} else "date"
+        items = _sort(items, sort_key)
+
+        # 3 — group by category preserving sort order
         cats_to_show = [active_category] if active_category else list(MediaCategory)
-        grouped: dict = {}
-        for cat in cats_to_show:
-            items = app.library.filter_by_category(cat)
-            if active_status:
-                items = [i for i in items if i.status == active_status]
-            grouped[cat] = items
+        grouped = {cat: [i for i in items if i.category == cat] for cat in cats_to_show}
 
         total = sum(len(v) for v in grouped.values())
         return render_template(
@@ -56,6 +83,8 @@ def create_app() -> Flask:
             total=total,
             active_category=active_category,
             active_status=active_status,
+            sort_key=sort_key,
+            query=query,
             statuses=list(MediaStatus),
         )
 
