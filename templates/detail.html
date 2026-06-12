@@ -86,7 +86,11 @@
         </div>
       </form>
 
-      {# Task 8 will add the delete button here #}
+      <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #eee;">
+      <form method="POST" action="{{ url_for('delete', item_id=item.id) }}"
+            onsubmit="return confirm('Delete {{ item.title }}? This cannot be undone.')">
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
     </div>
 
   </div>

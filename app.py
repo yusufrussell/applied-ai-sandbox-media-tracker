@@ -168,6 +168,13 @@ def create_app() -> Flask:
         save(app.library)
         return redirect(url_for("detail", item_id=item_id))
 
+    @app.route("/media/<item_id>/delete", methods=["POST"])
+    def delete(item_id: str):
+        if not app.library.remove(item_id):
+            abort(404)
+        save(app.library)
+        return redirect(url_for("home"))
+
     return app
 
 
