@@ -1,0 +1,144 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #f5f5f5;
+  color: #1a1a1a;
+  min-height: 100vh;
+}
+
+/* ── Nav ── */
+.navbar {
+  background: #1a2540;
+  color: #fff;
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.nav-links a {
+  color: #c8cfe0;
+  text-decoration: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.nav-links a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ── Layout ── */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Page header ── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.page-header h1 { font-size: 1.6rem; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-block;
+  background: #1a2540;
+  color: #fff;
+  padding: 0.5rem 1.1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.85; }
+.btn-danger { background: #b00020; }
+.btn-secondary { background: #555; }
+
+/* ── Category sections ── */
+.category-section { margin-bottom: 2.5rem; }
+.category-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #555;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Item grid ── */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+.card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.1s;
+  display: block;
+}
+.card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.1); transform: translateY(-1px); }
+.card-title { font-weight: 600; margin-bottom: 0.4rem; font-size: 0.95rem; }
+.card-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+/* ── Status badges ── */
+.badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  text-transform: capitalize;
+}
+.status-planning    { background: #e8f0fe; color: #1967d2; }
+.status-in-progress { background: #fef7e0; color: #b06000; }
+.status-completed   { background: #e6f4ea; color: #1e7e34; }
+.status-dropped     { background: #fce8e6; color: #c5221f; }
+.status-on-hold     { background: #f1f1f1; color: #555; }
+
+/* ── Rating ── */
+.rating { font-size: 0.8rem; color: #888; }
+
+/* ── Count pill ── */
+.count { font-size: 0.8em; color: #888; font-weight: 400; margin-left: 0.3rem; }
+
+/* ── Empty state ── */
+.empty { color: #888; margin-top: 2rem; font-size: 1rem; }
+
+/* ── Forms (used in add/detail) ── */
+.form-group { margin-bottom: 1.1rem; }
+label { display: block; font-weight: 600; margin-bottom: 0.3rem; font-size: 0.9rem; }
+input[type=text], input[type=number], select, textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.95rem;
+}
+textarea { resize: vertical; }
+.form-actions { display: flex; gap: 0.75rem; align-items: center; margin-top: 1.5rem; }
+.error { color: #b00020; font-size: 0.85rem; margin-top: 0.25rem; }

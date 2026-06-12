@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Media Tracker — All{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <h1>My List <span class="count">({{ total }})</span></h1>
+    <a class="btn" href="{{ url_for('add') }}">+ Add</a>
+  </div>
+
+  {% if total == 0 %}
+    <p class="empty">Nothing tracked yet. Hit <strong>+ Add</strong> to get started.</p>
+  {% else %}
+    {% for cat, items in grouped.items() %}
+      {% if items %}
+        <section class="category-section">
+          <h2 class="category-heading">{{ cat.value.replace('_', ' ').title() }}
+            <span class="count">{{ items|length }}</span>
+          </h2>
+          <div class="item-grid">
+            {% for item in items %}
+              <a class="card" href="{{ url_for('detail', item_id=item.id) }}">
+                <div class="card-title">{{ item.title }}</div>
+                <div class="card-meta">
+                  <span class="badge status-{{ item.status.value.replace('_', '-') }}">
+                    {{ item.status.value.replace('_', ' ') }}
+                  </span>
+                  {% if item.rating %}
+                    <span class="rating">★ {{ item.rating }}/10</span>
+                  {% endif %}
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endblock %}
