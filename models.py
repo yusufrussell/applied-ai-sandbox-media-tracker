@@ -50,16 +50,23 @@ class MediaItem:
 
     @classmethod
     def from_dict(cls, data: dict) -> MediaItem:
-        """Factory — returns the correct subclass based on the category field."""
+        """Factory — returns the correct subclass based on the category field.
+
+        id is optional: omit it when creating new items so the dataclass
+        default_factory generates a fresh one; include it when reloading
+        from storage so the original id is preserved.
+        """
         subclass = _CATEGORY_MAP[data["category"]]
-        return subclass(
-            title=data["title"],
-            status=MediaStatus(data["status"]),
-            rating=data.get("rating"),
-            notes=data.get("notes", ""),
-            date_added=data.get("date_added", date.today().isoformat()),
-            id=data["id"],
-        )
+        kwargs: dict = {
+            "title": data["title"],
+            "status": MediaStatus(data["status"]),
+            "rating": data.get("rating"),
+            "notes": data.get("notes", ""),
+            "date_added": data.get("date_added", date.today().isoformat()),
+        }
+        if "id" in data:
+            kwargs["id"] = data["id"]
+        return subclass(**kwargs)
 
 
 class Movie(MediaItem):

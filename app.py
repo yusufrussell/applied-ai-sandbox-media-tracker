@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, request, redirect, url_for, abort
 
-from models import MediaCategory, MediaLibrary
-from storage import load
+from models import MediaCategory, MediaItem, MediaLibrary, MediaStatus
+from storage import load, save
 
 
 def create_app() -> Flask:
@@ -27,8 +27,55 @@ def create_app() -> Flask:
 
     @app.route("/add", methods=["GET", "POST"])
     def add():
-        # TASK 05 — full implementation
-        return render_template("add.html")
+        errors: dict[str, str] = {}
+        form: dict[str, str] = {}
+
+        if request.method == "POST":
+            title = (request.form.get("title") or "").strip()
+            category = request.form.get("category", MediaCategory.MOVIE.value)
+            status = request.form.get("status", MediaStatus.PLANNING.value)
+            rating_raw = (request.form.get("rating") or "").strip()
+            notes = (request.form.get("notes") or "").strip()
+
+            form = {
+                "title": title,
+                "category": category,
+                "status": status,
+                "rating": rating_raw,
+                "notes": notes,
+            }
+
+            if not title:
+                errors["title"] = "Title is required."
+
+            rating: int | None = None
+            if rating_raw:
+                try:
+                    rating = int(rating_raw)
+                    if not 1 <= rating <= 10:
+                        errors["rating"] = "Rating must be between 1 and 10."
+                        rating = None
+                except ValueError:
+                    errors["rating"] = "Rating must be a whole number."
+
+            if not errors:
+                item = MediaItem.from_dict({
+                    "title": title,
+                    "category": category,
+                    "status": status,
+                    "rating": rating,
+                    "notes": notes,
+                })
+                app.library.add(item)
+                save(app.library)
+                return redirect(url_for("home"))
+
+        return render_template(
+            "add.html",
+            form=form,
+            errors=errors,
+            statuses=list(MediaStatus),
+        )
 
     @app.route("/media/<item_id>")
     def detail(item_id: str):
