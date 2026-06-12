@@ -113,11 +113,60 @@ def create_app() -> Flask:
 
     @app.route("/media/<item_id>")
     def detail(item_id: str):
-        # TASK 07 — full implementation
         item = app.library.get(item_id)
         if item is None:
             abort(404)
-        return render_template("detail.html", item=item)
+        return render_template(
+            "detail.html",
+            item=item,
+            statuses=list(MediaStatus),
+            errors={},
+            form={},
+        )
+
+    @app.route("/media/<item_id>/edit", methods=["POST"])
+    def edit(item_id: str):
+        item = app.library.get(item_id)
+        if item is None:
+            abort(404)
+
+        status_raw = request.form.get("status", "")
+        rating_raw = (request.form.get("rating") or "").strip()
+        notes = (request.form.get("notes") or "").strip()
+
+        errors: dict[str, str] = {}
+
+        try:
+            new_status = MediaStatus(status_raw)
+        except ValueError:
+            errors["status"] = "Invalid status."
+            new_status = item.status
+
+        new_rating: int | None = None
+        if rating_raw:
+            try:
+                new_rating = int(rating_raw)
+                if not 1 <= new_rating <= 10:
+                    errors["rating"] = "Rating must be between 1 and 10."
+                    new_rating = item.rating
+            except ValueError:
+                errors["rating"] = "Rating must be a whole number."
+                new_rating = item.rating
+
+        if errors:
+            return render_template(
+                "detail.html",
+                item=item,
+                statuses=list(MediaStatus),
+                errors=errors,
+                form={"status": status_raw, "rating": rating_raw, "notes": notes},
+            )
+
+        item.status = new_status
+        item.rating = new_rating
+        item.notes = notes
+        save(app.library)
+        return redirect(url_for("detail", item_id=item_id))
 
     return app
 

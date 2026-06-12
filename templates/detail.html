@@ -1,6 +1,93 @@
 {% extends "base.html" %}
 {% block title %}{{ item.title }} — Media Tracker{% endblock %}
+
 {% block content %}
-  <h1>{{ item.title }}</h1>
-  <p>Coming in Task 7.</p>
+  <div class="page-header">
+    <div>
+      <a class="back-link" href="{{ url_for('home', category=item.category.value) }}">
+        ← {{ item.category.value.replace('_', ' ').title() }}
+      </a>
+      <h1 style="margin-top: 0.25rem;">{{ item.title }}</h1>
+    </div>
+  </div>
+
+  <div class="detail-layout">
+
+    {# ── Info panel ── #}
+    <div class="detail-info">
+      <dl class="info-list">
+        <dt>Category</dt>
+        <dd>{{ item.category.value.replace('_', ' ').title() }}</dd>
+
+        <dt>Status</dt>
+        <dd>
+          <span class="badge status-{{ item.status.value.replace('_', '-') }}">
+            {{ item.status.value.replace('_', ' ').title() }}
+          </span>
+        </dd>
+
+        <dt>Rating</dt>
+        <dd>
+          {% if item.rating %}
+            <strong>★ {{ item.rating }}</strong> / 10
+          {% else %}
+            <span style="color:#aaa;">Not rated</span>
+          {% endif %}
+        </dd>
+
+        <dt>Added</dt>
+        <dd>{{ item.date_added }}</dd>
+
+        {% if item.notes %}
+          <dt>Notes</dt>
+          <dd class="notes-text">{{ item.notes }}</dd>
+        {% endif %}
+      </dl>
+    </div>
+
+    {# ── Edit form ── #}
+    <div class="detail-edit">
+      <h2>Edit</h2>
+      <form method="POST" action="{{ url_for('edit', item_id=item.id) }}">
+
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            {% for st in statuses %}
+              <option value="{{ st.value }}"
+                {{ 'selected' if (form.get('status', item.status.value) == st.value) }}>
+                {{ st.value.replace('_', ' ').title() }}
+              </option>
+            {% endfor %}
+          </select>
+          {% if errors.get('status') %}
+            <p class="error">{{ errors.status }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="rating">Rating (1–10, optional)</label>
+          <input id="rating" name="rating" type="number" min="1" max="10"
+                 value="{{ form.get('rating', item.rating or '') }}"
+                 style="max-width: 100px;">
+          {% if errors.get('rating') %}
+            <p class="error">{{ errors.rating }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Notes (optional)</label>
+          <textarea id="notes" name="notes" rows="4">{{ form.get('notes', item.notes) }}</textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" type="submit">Save changes</button>
+          <a class="btn btn-secondary" href="{{ url_for('home') }}">Back</a>
+        </div>
+      </form>
+
+      {# Task 8 will add the delete button here #}
+    </div>
+
+  </div>
 {% endblock %}

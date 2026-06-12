@@ -162,6 +162,39 @@ body {
 /* ── Empty state ── */
 .empty { color: #888; margin-top: 2rem; font-size: 1rem; }
 
+/* ── Detail page ── */
+.back-link { color: #888; text-decoration: none; font-size: 0.85rem; }
+.back-link:hover { color: #1a2540; }
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2rem;
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .detail-layout { grid-template-columns: 1fr; }
+}
+
+.detail-info {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+.info-list { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; }
+.info-list dt { font-weight: 600; color: #555; font-size: 0.85rem; padding-top: 0.15rem; }
+.info-list dd { margin: 0; }
+.notes-text { white-space: pre-wrap; color: #444; font-size: 0.9rem; }
+
+.detail-edit {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+.detail-edit h2 { font-size: 1rem; margin-bottom: 1rem; color: #333; }
+
 /* ── Forms (used in add/detail) ── */
 .form-group { margin-bottom: 1.1rem; }
 label { display: block; font-weight: 600; margin-bottom: 0.3rem; font-size: 0.9rem; }
